@@ -8,7 +8,7 @@ APK_SALTKEY       = os.environ.get('APK_SALTKEY', '')
 APK_ULASTACTIVITY = os.environ.get('APK_ULASTACTIVITY', '')
 
 if not APK_AUTH or not APK_SALTKEY:
-    print('Cookie 缺少，請確認 GitHub Secrets 設定正確')
+    print('Cookie missing, please check GitHub Secrets')
     sys.exit(1)
 
 BASE_URL = 'https://apk.tw'
@@ -41,9 +41,9 @@ html = resp.text
 
 # Step 2: Check login
 if ('mod=logging&action=login' in html and
-    'my_amupper' not in html and
-    'ppered' not in html and
-    'logout' not in html):
+        'my_amupper' not in html and
+        'ppered' not in html and
+        'logout' not in html):
     print('FAIL: Cookie expired, please update GitHub Secrets')
     sys.exit(1)
 print('OK: Logged in')
@@ -53,22 +53,22 @@ if already_signed(html):
     print('OK: Already signed today (homepage confirmed)')
     sys.exit(0)
 
-# Step 4: Check sign page if no button on homepage
+# Step 4: No button on homepage -> check sign page
 if 'id="my_amupper"' not in html and "id='my_amupper'" not in html:
     print('INFO: No sign button on homepage, checking sign page...')
-    sp = session.get(BASE_URL + '/plugin.php?id=dsu_paulsign:sign', timeout=20)
-    sp.encoding = 'utf-8'
-    sp = sp.text
-    # Already signed? -- THIS WAS THE BUG: we now exit(0) immediately here
+    sp_resp = session.get(BASE_URL + '/plugin.php?id=dsu_paulsign:sign', timeout=20)
+    sp_resp.encoding = 'utf-8'
+    sp = sp_resp.text
+    # KEY FIX: already signed on sign page -> exit 0 immediately
     if already_signed(sp):
         print('OK: Already signed today (sign page confirmed)')
         sys.exit(0)
-    # Found button on sign page -> use it
+    # Found button on sign page
     if 'id="my_amupper"' in sp or "id='my_amupper'" in sp:
         print('OK: Found sign button on sign page')
         html = sp
     else:
-        print('FAIL: Cannot find sign button, may not be logged in')
+        print('FAIL: Cannot find sign button or already-signed marker')
         print('Page snippet: ' + sp[:400])
         sys.exit(1)
 
