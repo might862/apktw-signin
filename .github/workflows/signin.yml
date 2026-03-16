@@ -24,6 +24,10 @@ jobs:
 
       - name: 執行簽到
         env:
+          # 方式一：帳號密碼登入（推薦，其他人使用只需填這兩個）
+          APK_USERNAME:      ${{ secrets.APK_USERNAME }}
+          APK_PASSWORD:      ${{ secrets.APK_PASSWORD }}
+          # 方式二：Cookie 登入（向下相容）
           APK_AUTH:          ${{ secrets.APK_AUTH }}
           APK_SALTKEY:       ${{ secrets.APK_SALTKEY }}
           APK_ULASTACTIVITY: ${{ secrets.APK_ULASTACTIVITY }}
