@@ -1,0 +1,30 @@
+name: APK.TW 每日自動簽到
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  signin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: 取得程式碼
+        uses: actions/checkout@v4
+
+      - name: 設定 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 安裝套件
+        run: pip install requests
+
+      - name: 執行簽到
+        env:
+          APK_AUTH:          ${{ secrets.APK_AUTH }}
+          APK_SALTKEY:       ${{ secrets.APK_SALTKEY }}
+          APK_ULASTACTIVITY: ${{ secrets.APK_ULASTACTIVITY }}
+        run: python signin.py
